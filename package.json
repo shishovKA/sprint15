@@ -1,10 +1,11 @@
 {
-  "name": "sprint13",
+  "name": "sprint15",
   "version": "1.0.0",
   "main": "app.js",
   "scripts": {
     "start": "node app.js",
-    "dev": "nodemon app.js"
+    "dev": "nodemon app.js",
+    "test": "jest"
   },
   "keywords": [],
   "author": "Konstantin Shishov",
@@ -22,15 +23,16 @@
     "eslint": "^7.6.0",
     "eslint-config-airbnb-base": "^14.2.0",
     "eslint-plugin-import": "^2.22.0",
+    "jest": "^26.4.2",
     "nodemon": "^2.0.4"
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/shishovKA/sprint12.git"
+    "url": "git+https://github.com/shishovKA/sprint15.git"
   },
   "bugs": {
-    "url": "https://github.com/shishovKA/sprint12/issues"
+    "url": "https://github.com/shishovKA/sprint15/issues"
   },
-  "homepage": "https://github.com/shishovKA/sprint12#readme",
-  "description": "Проектная работа 13-го спринта"
+  "homepage": "https://github.com/shishovKA/sprint15#readme",
+  "description": "Проектная работа 15-го спринта"
 }

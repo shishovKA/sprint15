@@ -13,6 +13,7 @@ app.use((err, req, res, next) => {
     next();
   }
 });
+
 app.use(bodyParser.urlencoded({ extended: true }));
 
 //  обработчик ошибки 404
@@ -29,6 +30,7 @@ const { login, createUser } = require('./controllers/users.js');
 
 // импортируем мидлвары
 const auth = require('./middlewares/auth');
+const err = require('./middlewares/err');
 
 app.use('/users', auth, routesUsers);
 app.use('/cards', auth, routesCards);
@@ -42,5 +44,7 @@ mongoose.connect('mongodb://localhost:27017/mestodb', {
   useCreateIndex: true,
   useFindAndModify: false,
 });
+
+//app.use(err);
 
 app.listen(PORT);
