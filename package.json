@@ -4,8 +4,7 @@
   "main": "app.js",
   "scripts": {
     "start": "node app.js",
-    "dev": "nodemon app.js",
-    "test": "jest"
+    "dev": "nodemon app.js"
   },
   "keywords": [],
   "author": "Konstantin Shishov",
@@ -13,11 +12,14 @@
   "dependencies": {
     "bcryptjs": "^2.4.3",
     "body-parser": "^1.19.0",
+    "celebrate": "^13.0.2",
     "express": "^4.17.1",
+    "express-winston": "^4.0.5",
     "jsonwebtoken": "^8.5.1",
     "mongoose": "^5.9.28",
     "password-validator": "^5.1.0",
-    "validator": "^13.1.1"
+    "validator": "^13.1.1",
+    "winston": "^3.3.3"
   },
   "devDependencies": {
     "eslint": "^7.6.0",
