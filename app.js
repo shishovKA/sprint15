@@ -60,7 +60,7 @@ const userValid = celebrate({
       if (!validator.isURL(value)) {
         return helper.message('поле avatar должно быть корректной ссылкой');
       }
-      return true;
+      return value;
     }),
     email: Joi.string().required().email(),
     password: Joi.string().required().token().min(8)

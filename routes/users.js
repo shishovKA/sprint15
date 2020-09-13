@@ -14,7 +14,7 @@ const avatarValid = celebrate({
       if (!validator.isURL(value)) {
         return helper.message('поле avatar должно быть корректной ссылкой');
       }
-      return true;
+      return value;
     }),
   }),
 });

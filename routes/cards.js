@@ -15,9 +15,9 @@ const cardValid = celebrate({
     name: Joi.string().required().min(2).max(30),
     link: Joi.string().required().custom((value, helper) => {
       if (!validator.isURL(value)) {
-        return helper.message('поле avatar должно быть корректной ссылкой');
+        return helper.message('поле link должно быть корректной ссылкой');
       }
-      return true;
+      return value;
     }),
   }),
 });
