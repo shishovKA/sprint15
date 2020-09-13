@@ -6,7 +6,7 @@ module.exports = (err, req, res, next) => {
     .status(statusCode)
     .send({
       message: statusCode === 500
-        ? 'На сервере произошла ошибка (ЦЕНТРАЛЬНЫЙ ОБРАБОТЧИК ОШИБКОВ)'
+        ? 'На сервере произошла ошибка'
         : message,
     });
 };

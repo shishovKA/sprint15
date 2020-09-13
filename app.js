@@ -1,6 +1,8 @@
+require('dotenv').config();
 const express = require('express');
 const mongoose = require('mongoose');
 const bodyParser = require('body-parser');
+const validator = require('validator');
 const { celebrate, Joi, errors } = require('celebrate');
 const NotFoundError = require('./errors/not-found-err');
 const { requestLogger, errorLogger } = require('./middlewares/logger');
@@ -54,7 +56,12 @@ const userValid = celebrate({
   body: Joi.object().keys({
     name: Joi.string().required().min(2).max(30),
     about: Joi.string().required().min(2).max(30),
-    avatar: Joi.string().required().uri(),
+    avatar: Joi.string().required().custom((value, helper) => {
+      if (!validator.isURL(value)) {
+        return helper.message('поле avatar должно быть корректной ссылкой');
+      }
+      return true;
+    }),
     email: Joi.string().required().email(),
     password: Joi.string().required().token().min(8)
       .max(100),
@@ -65,6 +72,13 @@ app.use(requestLogger);
 
 app.use('/users', auth, routesUsers);
 app.use('/cards', auth, routesCards);
+
+app.get('/crash-test', () => {
+  setTimeout(() => {
+    throw new Error('Сервер сейчас упадёт');
+  }, 0);
+});
+
 app.post('/signin', loginValid, login);
 app.post('/signup', userValid, createUser);
 

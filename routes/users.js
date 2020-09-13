@@ -1,4 +1,5 @@
 const router = require('express').Router();
+const validator = require('validator');
 const { celebrate, Joi } = require('celebrate');
 const {
   getUsers,
@@ -9,7 +10,12 @@ const {
 
 const avatarValid = celebrate({
   body: Joi.object().keys({
-    avatar: Joi.string().required().uri(),
+    avatar: Joi.string().required().custom((value, helper) => {
+      if (!validator.isURL(value)) {
+        return helper.message('поле avatar должно быть корректной ссылкой');
+      }
+      return true;
+    }),
   }),
 });
 
