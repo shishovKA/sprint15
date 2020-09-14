@@ -89,7 +89,7 @@ module.exports.updateUserAvatar = (req, res, next) => {
     .catch(next);
 };
 
-module.exports.login = (req, res) => {
+module.exports.login = (req, res, next) => {
   const { email, password } = req.body;
 
   return User.findUserByCredentials(email, password)
@@ -109,9 +109,6 @@ module.exports.login = (req, res) => {
       res.send({ token });
     })
     .catch((err) => {
-      // ошибка аутентификации
-      res
-        .status(401)
-        .send({ message: err.message });
+      next(new NotFoundError(err.message));
     });
 };
