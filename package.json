@@ -1,5 +1,5 @@
 {
-  "name": "sprint13",
+  "name": "sprint15",
   "version": "1.0.0",
   "main": "app.js",
   "scripts": {
@@ -12,25 +12,30 @@
   "dependencies": {
     "bcryptjs": "^2.4.3",
     "body-parser": "^1.19.0",
+    "celebrate": "^13.0.2",
+    "dotenv": "^8.2.0",
     "express": "^4.17.1",
+    "express-winston": "^4.0.5",
     "jsonwebtoken": "^8.5.1",
     "mongoose": "^5.9.28",
     "password-validator": "^5.1.0",
-    "validator": "^13.1.1"
+    "validator": "^13.1.1",
+    "winston": "^3.3.3"
   },
   "devDependencies": {
     "eslint": "^7.6.0",
     "eslint-config-airbnb-base": "^14.2.0",
     "eslint-plugin-import": "^2.22.0",
+    "jest": "^26.4.2",
     "nodemon": "^2.0.4"
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/shishovKA/sprint12.git"
+    "url": "git+https://github.com/shishovKA/sprint15.git"
   },
   "bugs": {
-    "url": "https://github.com/shishovKA/sprint12/issues"
+    "url": "https://github.com/shishovKA/sprint15/issues"
   },
-  "homepage": "https://github.com/shishovKA/sprint12#readme",
-  "description": "Проектная работа 13-го спринта"
+  "homepage": "https://github.com/shishovKA/sprint15#readme",
+  "description": "Проектная работа 15-го спринта"
 }

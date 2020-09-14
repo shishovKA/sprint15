@@ -1,33 +1,28 @@
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
-const PasswordValidator = require('password-validator');
 const User = require('../models/user.js');
+const NotFoundError = require('../errors/not-found-err');
+const SameEmailError = require('../errors/same-email-err');
 
-const passwordSchema = new PasswordValidator();
+const { NODE_ENV, JWT_SECRET } = process.env;
 
-passwordSchema
-  .is().min(8)
-  .is().max(100)
-  // eslint-disable-next-line newline-per-chained-call
-  .has().not().spaces();
-
-module.exports.getUsers = (req, res) => {
+module.exports.getUsers = (req, res, next) => {
   User.find({})
     .then((users) => res.send({ data: users }))
-    .catch(() => res.status(500).send({ message: 'На сервере произошла ошибка' }));
+    .catch(next);
 };
 
-module.exports.getUserById = (req, res) => {
+module.exports.getUserById = (req, res, next) => {
   const { userId } = req.params;
   User.findById(userId)
     .then((user) => {
-      if (!user) return res.status(404).send({ message: 'пользователь не найден' });
-      return res.send({ data: user });
+      if (!user) throw new NotFoundError('Нет пользователя с таким id');
+      res.send({ data: user });
     })
-    .catch(() => res.status(404).send({ message: 'пользователь не найден' }));
+    .catch(next);
 };
 
-module.exports.createUser = (req, res) => {
+module.exports.createUser = (req, res, next) => {
   const {
     name,
     about,
@@ -36,32 +31,31 @@ module.exports.createUser = (req, res) => {
     password,
   } = req.body;
 
-  if (passwordSchema.validate(password)) {
-    bcrypt.hash(password, 10)
-      .then((hash) => User.create({
-        name,
-        about,
-        avatar,
-        email,
-        password: hash,
-      })
-        .then((user) => {
-          const sendUser = JSON.parse(JSON.stringify(user));
-          delete sendUser.password;
-          res.send({ data: sendUser });
-        }))
-      .catch((err) => {
-        if (err.code === 11000) return res.status(409).send({ message: 'пользователь с таким email уже зарегистрирован' });
-        return res.status(400).send({ message: err.message });
-      });
-  } else res.status(400).send({ message: 'неверный формат пароля' });
+  bcrypt.hash(password, 10)
+    .then((hash) => User.create({
+      name,
+      about,
+      avatar,
+      email,
+      password: hash,
+    })
+      .then((user) => {
+        const sendUser = JSON.parse(JSON.stringify(user));
+        delete sendUser.password;
+        res.send({ data: sendUser });
+      }))
+    .catch((err) => {
+      if (err.code === 11000) next(new SameEmailError('Пользователь с таким email уже зарегистрирован'));
+      next(err);
+      return true;
+    });
 };
 
-module.exports.updateUser = (req, res) => {
+module.exports.updateUser = (req, res, next) => {
   const userId = req.user._id;
   User.findById(userId)
     .then((me) => {
-      if (!me) return res.status(404).send({ message: 'пользователь не найден' });
+      if (!me) throw new NotFoundError('Нет пользователя с таким id');
       const { name = me.name, about = me.about } = req.body;
       return User.findByIdAndUpdate(
         userId,
@@ -72,13 +66,12 @@ module.exports.updateUser = (req, res) => {
           upsert: true,
         },
       )
-        .then((user) => res.send({ data: user }))
-        .catch(() => res.status(400).send({ message: 'Данные не прошли валидацию' }));
+        .then((user) => res.send({ data: user }));
     })
-    .catch(() => res.status(404).send({ message: 'пользователь не найден' }));
+    .catch(next);
 };
 
-module.exports.updateUserAvatar = (req, res) => {
+module.exports.updateUserAvatar = (req, res, next) => {
   const userId = req.user._id;
   const { avatar } = req.body;
   User.findByIdAndUpdate(
@@ -90,19 +83,19 @@ module.exports.updateUserAvatar = (req, res) => {
     },
   )
     .then((user) => {
-      if (!user) return res.status(404).send({ message: 'пользователь не найден' });
+      if (!user) throw new NotFoundError('Нет пользователя с таким id');
       return res.send({ data: user });
     })
-    .catch(() => res.status(400).send({ message: 'Пользователь не найден, или данные не валидны' }));
+    .catch(next);
 };
 
-module.exports.login = (req, res) => {
+module.exports.login = (req, res, next) => {
   const { email, password } = req.body;
 
   return User.findUserByCredentials(email, password)
     .then((user) => {
       // создадим токен
-      const token = jwt.sign({ _id: user._id }, 'some-secret-key', { expiresIn: '7d' });
+      const token = jwt.sign({ _id: user._id }, NODE_ENV === 'production' ? JWT_SECRET : 'dev-secret', { expiresIn: '7d' });
 
       /* запись token в куку
       res
@@ -116,9 +109,6 @@ module.exports.login = (req, res) => {
       res.send({ token });
     })
     .catch((err) => {
-      // ошибка аутентификации
-      res
-        .status(401)
-        .send({ message: err.message });
+      next(new NotFoundError(err.message));
     });
 };

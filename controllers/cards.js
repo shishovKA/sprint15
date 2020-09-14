@@ -1,42 +1,44 @@
 const Card = require('../models/card');
+const NotFoundError = require('../errors/not-found-err');
+const ForbiddenError = require('../errors/forbidden-err');
 
-module.exports.getCards = (req, res) => {
+module.exports.getCards = (req, res, next) => {
   Card.find({})
     .then((cards) => res.send({ data: cards }))
-    .catch(() => res.status(500).send({ message: 'На сервере произошла ошибка' }));
+    .catch(next);
 };
 
-module.exports.createCard = (req, res) => {
+module.exports.createCard = (req, res, next) => {
   const { name, link } = req.body;
   const owner = req.user._id;
   Card.create({ name, link, owner })
     .then((card) => res.send({ data: card }))
-    .catch((err) => res.status(400).send({ message: err.message }));
+    .catch(next);
 };
 
 module.exports.checkOwner = (req, res, next) => {
   const { cardId } = req.params;
   Card.findById(cardId)
     .then((card) => {
-      if (!card) return res.status(404).send({ message: 'карточка не найдена' });
-      if (!card.owner.equals(req.user._id)) return res.status(403).send({ message: 'вы не можете удалять чужую карточку' });
+      if (!card) throw new NotFoundError('Карточка не найдена');
+      if (!card.owner.equals(req.user._id)) throw new ForbiddenError('Вы не можете удалять чужую карточку');
       next();
       return true;
     })
-    .catch(() => res.status(404).send({ message: 'карточка не найдена' }));
+    .catch(next);
 };
 
-module.exports.delCardById = (req, res) => {
+module.exports.delCardById = (req, res, next) => {
   const { cardId } = req.params;
   Card.findByIdAndRemove(cardId)
     .then((card) => {
-      if (!card) return res.status(404).send({ message: 'карточка не найдена' });
+      if (!card) throw new NotFoundError('Карточка не найдена');
       return res.send({ data: card });
     })
-    .catch(() => res.status(404).send({ message: 'карточка не найдена' }));
+    .catch(next);
 };
 
-module.exports.likeCard = (req, res) => {
+module.exports.likeCard = (req, res, next) => {
   const { cardId } = req.params;
   Card.findByIdAndUpdate(
     cardId,
@@ -44,13 +46,13 @@ module.exports.likeCard = (req, res) => {
     { new: true },
   )
     .then((card) => {
-      if (!card) return res.status(404).send({ message: 'карточка не найдена' });
+      if (!card) throw new NotFoundError('Карточка не найдена');
       return res.send({ data: card });
     })
-    .catch(() => res.status(404).send({ message: 'карточка не найдена' }));
+    .catch(next);
 };
 
-module.exports.dislikeCard = (req, res) => {
+module.exports.dislikeCard = (req, res, next) => {
   const { cardId } = req.params;
   Card.findByIdAndUpdate(
     cardId,
@@ -58,8 +60,8 @@ module.exports.dislikeCard = (req, res) => {
     { new: true },
   )
     .then((card) => {
-      if (!card) return res.status(404).send({ message: 'карточка не найдена' });
+      if (!card) throw new NotFoundError('Карточка не найдена');
       return res.send({ data: card });
     })
-    .catch(() => res.status(404).send({ message: 'карточка не найдена' }));
+    .catch(next);
 };
