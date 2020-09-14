@@ -26,8 +26,14 @@ const userUpdateValid = celebrate({
   }),
 });
 
+const userIdValid = celebrate({
+  params: Joi.object().keys({
+    userId: Joi.string().hex().length(24),
+  }),
+});
+
 router.get('/', getUsers);
-router.get('/:userId', getUserById);
+router.get('/:userId', userIdValid, getUserById);
 router.patch('/me', userUpdateValid, updateUser);
 router.patch('/me/avatar', avatarValid, updateUserAvatar);
 

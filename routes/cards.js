@@ -22,10 +22,16 @@ const cardValid = celebrate({
   }),
 });
 
+const cardIdValid = celebrate({
+  params: Joi.object().keys({
+    cardId: Joi.string().hex().length(24),
+  }),
+});
+
 router.get('/', getCards);
 router.post('/', cardValid, createCard);
-router.delete('/:cardId', checkOwner, delCardById);
-router.put('/:cardId/likes', likeCard);
-router.delete('/:cardId/likes', dislikeCard);
+router.delete('/:cardId', cardIdValid, checkOwner, delCardById);
+router.put('/:cardId/likes', cardIdValid, likeCard);
+router.delete('/:cardId/likes', cardIdValid, dislikeCard);
 
 module.exports = router;
